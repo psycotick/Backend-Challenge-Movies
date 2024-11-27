@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "sonarsource.sonarlint-vscode",
+    "esbenp.prettier-vscode",
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+    "vivaxy.vscode-conventional-commits",
+    "inlang.vs-code-extension"
+  ]
+}

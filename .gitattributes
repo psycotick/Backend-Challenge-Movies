@@ -1,0 +1,11 @@
+# Handle line endings automatically for files detected as text 
+# and leave all files detected as binary untouched.
+* text=auto
+
+# Set line endings to LF, even on Windows. Otherwise, execution within Docker fails.
+# See https://help.github.com/articles/dealing-with-line-endings/
+*.sh text eol=lf
+
+# Prevent Line ending conversion to docker files, that will have according to OS
+Dockerfile -text
+*.Dockerfile -text
