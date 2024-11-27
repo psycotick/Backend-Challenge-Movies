@@ -33,7 +33,7 @@ async function bootstrap(): Promise<void> {
 
   //firebase ;
   const firebaseKeyFilePath =
-    "./movies-appweb-auth-firebase-adminsdk-is01r-7f6e0ff8ec.json";
+    "./movies-app-auth-6c554-firebase-adminsdk-h5yws-ff3016a432.json";
   const firebaseServiceAccount /*: ServiceAccount*/ = JSON.parse(
     fs.readFileSync(firebaseKeyFilePath).toString(),
   );
