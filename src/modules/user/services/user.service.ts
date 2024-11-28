@@ -41,6 +41,36 @@ export class UserService {
     }
   }
 
+  async refreshAuthToken(refreshToken: string) {
+    try {
+      const {
+        id_token: idToken,
+        refresh_token: newRefreshToken,
+        expires_in: expiresIn,
+      } = await this.sendRefreshAuthTokenRequest(refreshToken);
+      return {
+        idToken,
+        refreshToken: newRefreshToken,
+        expiresIn,
+      };
+    } catch (error: any) {
+      if (error.message.includes('INVALID_REFRESH_TOKEN')) {
+        throw new Error(`Invalid refresh token: ${refreshToken}.`);
+      } else {
+        throw new Error('Failed to refresh token');
+      }
+    }
+  }
+  
+  private async sendRefreshAuthTokenRequest(refreshToken: string) {
+    const url = `https://securetoken.googleapis.com/v1/token?key=${process.env.APIKEY}`;
+    const payload = {
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    };
+    return await this.sendPostRequest(url, payload);
+  }
+
   private async signInWithEmailAndPassword(email: string, password: string) {
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.APIKEY}`;
     return await this.sendPostRequest(url, {
@@ -49,7 +79,7 @@ export class UserService {
       returnSecureToken: true,
     });
   }
-  
+
   private async sendPostRequest(url: string, data: any) {
     try {
       const response = await axios.post(url, data, {
@@ -58,6 +88,37 @@ export class UserService {
       return response.data;
     } catch (error) {
       console.log("error", error);
+    }
+  }
+
+  async validateRequest(req): Promise<boolean> {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      console.log('Authorization header not provided.');
+      return false;
+    }
+    const [bearer, token] = authHeader.split(' ');
+    if (bearer !== 'Bearer' || !token) {
+      console.log('Invalid authorization format. Expected "Bearer <token>".');
+      return false;
+    }
+    try {
+      const decodedToken = await firebaseAdmin.auth().verifyIdToken(token);
+      console.log('Decoded Token:', decodedToken);
+      return true;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        if (error.message.includes('auth/id-token-expired')) {
+          console.error('Token has expired.');
+        } else if (error.message.includes('auth/invalid-id-token')) {
+          console.error('Invalid ID token provided.');
+        } else {
+          console.error('Error verifying token:', error.message);
+        }
+      } else {
+        console.error('Unknown error occurred during token verification.');
+      }
+      return false;
     }
   }
 
