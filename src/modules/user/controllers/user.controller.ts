@@ -1,69 +1,86 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   UsePipes,
   ValidationPipe,
-  UseGuards,
   Query,
+  Logger,
+  HttpException,
+  HttpStatus,
 } from "@nestjs/common";
 import { UserService } from "../services/user.service";
-import { CreateUserDto } from "../dto/create-user.dto";
-import { UpdateUserDto } from "../dto/update-user.dto";
 import { RegisterUserDto } from "../dto/register-user.dto";
 import { LoginDto } from "../dto/login.dto";
-import { ApiBearerAuth } from "@nestjs/swagger";
-import { AuthGuard } from "src/guards/auth.guard";
 
+/**
+ * Controlador de Lógica para manejar las solicitudes relacionadas con los usuarios.
+ * @author Santiago Ruiz - santiago.develops@gmail.com
+ * @copyright Psycotick Software S.L.
+ * @license MIT
+ */
 @Controller("user")
 export class UserController {
+  private readonly logger = new Logger(UserController.name);
+
   constructor(private readonly userService: UserService) {}
 
+  /**
+   * Registro de un nuevo usuario.
+   * @param {RegisterUserDto} registerUserDto 
+   * @returns {Promise<any>}
+   * @throws {HttpException} 
+   */
   @Post("register")
   @UsePipes(new ValidationPipe({ transform: true }))
-  registerUser(@Body() registerUserDTo: RegisterUserDto) {
-    return this.userService.registerUser(registerUserDTo);
+  async registerUser(@Body() registerUserDto: RegisterUserDto) {
+    try {
+      return await this.userService.registerUser(registerUserDto);
+    } catch (error) {
+      this.logger.error("Error registering user");
+      throw new HttpException(
+        "Error registering user",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
+  /**
+   * Inicio de sesión de un usuario.
+   * @param {LoginDto} loginDto 
+   * @returns {Promise<any>} 
+   * @throws {HttpException} 
+   */
   @Post("login")
   @UsePipes(new ValidationPipe({ transform: true }))
-  login(@Body() loginDto: LoginDto) {
-    return this.userService.loginUser(loginDto);
+  async login(@Body() loginDto: LoginDto) {
+    try {
+      return await this.userService.loginUser(loginDto);
+    } catch (error) {
+      this.logger.error("Error logging in user");
+      throw new HttpException(
+        "Error logging in user",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
+  /**
+   * Actualización del token de autenticación.
+   * @param {string} refreshToken 
+   * @returns {Promise<any>}
+   * @throws {HttpException}
+   */
   @Post("refresh-auth")
-  refreshAuth(@Query("refreshToken") refreshToken: string) {
-    return this.userService.refreshAuthToken(refreshToken);
-  }
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Get()
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.userService.remove(+id);
+  async refreshAuth(@Query("refreshToken") refreshToken: string) {
+    try {
+      return await this.userService.refreshAuthToken(refreshToken);
+    } catch (error) {
+      this.logger.error("Error refreshing authentication token");
+      throw new HttpException(
+        "Error refreshing authentication token",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

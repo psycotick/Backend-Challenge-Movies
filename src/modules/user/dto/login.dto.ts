@@ -1,6 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, Length } from "class-validator";
 
+/**
+ * Dto de Login para los usuarios.
+ * @author Santiago Ruiz - santiago.develops@gmail.com
+ * @copyright Psycotick Software S.L.
+ * @license MIT
+ */
+
 export class LoginDto {
   @ApiProperty({ description: "The user's email address" })
   @IsNotEmpty()
