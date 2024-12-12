@@ -20,9 +20,9 @@ async function bootstrap(): Promise<void> {
   });
 
   const config = new DocumentBuilder()
-    .setTitle("User Authentication")
+    .setTitle("Backend Movie Authentication")
     .setDescription(
-      "Los detalles de la API para la aplicación de demostración de autenticación de usuario que utiliza Firebase en el backend de NestJS.",
+      "Los detalles de la API para la aplicación de demostración de autenticación y peliculas",
     )
     .setVersion("1.0")
     .addTag("Authentication")
